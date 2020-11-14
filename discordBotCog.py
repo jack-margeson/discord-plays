@@ -30,6 +30,9 @@ class DiscordPlays(commands.Cog):
         firebase_admin.initialize_app(credential=self.cred)
         self.db = firestore.client()
 
+        # variable to store the mode
+        self.mode = 'anarchy'
+
     def cog_unload(self):
         self.main_loop.cancel()
 
@@ -100,7 +103,7 @@ class DiscordPlays(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.command(name='list', brief='Lists the availible games to play.',
-                      help='List the games that can be activated using the play command')
+                      help='List the games that can be activated using the play command.')
     async def list_command(self, ctx):
         with open('games/games.json') as json_file:
             gamelist = json.load(json_file)
@@ -110,8 +113,32 @@ class DiscordPlays(commands.Cog):
         embed = self.makeEmbed('Controller', 0x77dd77, 'Game List', message)
         await ctx.send(embed=embed)
 
+    @commands.command(name='mode', brief='Sets or shows the mode of the bot.',
+                      help='With no arguments it shows the current mode. Valid modes are democracy or anarchy')
+    @commands.has_role('Admin')
+    async def modeset_command(self, ctx, mode):
+        if mode != 'democracy' and mode != 'anarchy':
+            raise commands.BadArgument(
+                'Invaild mode: valid mode are democracy or anarchy')
+        self.mode = mode
+        embed = self.makeEmbed(
+            'Controller', 0x77dd77, 'Current Mode:', '{0}'.format(self.mode))
+        await ctx.send(embed=embed)
+
+    @modeset_command.error
+    async def modeset_command_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument) or isinstance(error, commands.MissingRole):
+            embed = self.makeEmbed(
+                'Controller', 0x77dd77, 'Current Mode:', '{0}'.format(self.mode))
+            await ctx.send(embed=embed)
+        if isinstance(error, commands.BadArgument):
+            embed = self.makeEmbed(
+                'Controller', 0xff4055, 'Bad argument', '{0}'.format(error))
+            await ctx.send(embed=embed)
+
     # on_message function for eventual reading of inputs
-    @commands.Cog.listener()
+
+    @ commands.Cog.listener()
     async def on_message(self, message):
         if message.channel in self.activeChannels:
             if message.content in self.controlsDict:
