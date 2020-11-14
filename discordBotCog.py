@@ -2,9 +2,12 @@ import discord
 from discord.ext import tasks, commands
 import controller
 from collections import deque
+from firebase_admin import firestore
+from firebase_admin import credentials
+import firebase_admin
+import json
 
-
-# Cog that hold the bot
+# Cog that holds the bot
 
 
 class DiscordPlays(commands.Cog):
@@ -15,11 +18,17 @@ class DiscordPlays(commands.Cog):
         self.activeChannels = []
 
         # dictionary to hold the controls
-        self.controlsDict = controller.load_controls_dict('controls.json')
+        self.controlsDict = {}
         self.controlsQueue = deque([])
 
         # variable to store the active game
         self.activeGame = ''
+
+        # Firestore setup
+        self.cred = credentials.Certificate(
+            "discord-plays-firebase-adminsdk-regue-e6d351cad8.json")
+        firebase_admin.initialize_app(credential=self.cred)
+        self.db = firestore.client()
 
     def cog_unload(self):
         self.main_loop.cancel()
@@ -37,32 +46,26 @@ class DiscordPlays(commands.Cog):
         if not ctx.message.channel in self.activeChannels:
             if (not self.activeGame and GameName) or (self.activeGame and not GameName):
                 if not self.activeGame:
+                    print('attempting to load game', GameName)
+                    try:
+                        config = controller.load_controls_dict(
+                            'games/{0}.json'.format(GameName))
+                    except FileNotFoundError:
+                        print('Error loading game', GameName)
+                        raise commands.BadArgument(
+                            'Error loading game `{0}`'.format(GameName))
+                    print('loaded game', GameName)
+                    self.controlsDict = config
                     self.activeGame = GameName
-                    await ctx.bot.change_presence(status=discord.Status.idle,
+                    await ctx.bot.change_presence(status=discord.Status.online,
                                                   activity=discord.Game(name=self.activeGame))
-                embed = discord.Embed(title='Controller', color=0x77dd77)
-                embed.add_field(name='Activated',
-                                value='Now listening to chat in `{0}` for the game `{1}`.'.format(ctx.message.channel.name, self.activeGame), inline=False)
-                embed.set_author(name='discord-plays',
-                                 icon_url='https://raw.githubusercontent.com/jack-margeson/discord-plays/master/profile_picture.png')
+                embed = self.makeEmbed('Controller', 0x77dd77, 'Activated', 'Now listening to chat in `{0}` for the game `{1}`.'.format(
+                    ctx.message.channel.name, self.activeGame))
                 await ctx.send(embed=embed)
                 self.activeChannels.append(ctx.message.channel)
-
-            else:
-                embed = discord.Embed(title='Controller', color=0xff4055)
-                embed.add_field(name='Unkown arguments',
-                                value='If no game is running type `{0}start` followed by the game.\nIf a game is running in another channel, simply type `{0}start`'.format(
-                                    ctx.bot. command_prefix),
-                                inline=False)
-                embed.set_author(name='discord-plays',
-                                 icon_url='https://raw.githubusercontent.com/jack-margeson/discord-plays/master/profile_picture.png')
-                await ctx.send(embed=embed)
         else:
-            embed = discord.Embed(title='Controller', color=0xff4055)
-            embed.add_field(
-                name='Error', value='Controller is already active.')
-            embed.set_author(name='discord-plays',
-                             icon_url='https://raw.githubusercontent.com/jack-margeson/discord-plays/master/profile_picture.png')
+            embed = self.makeEmbed(
+                'Controller', 0xff4055, 'Error', 'Controller is already active.')
             await ctx.send(embed=embed)
 
     # Command to stop the reading of inputs
@@ -72,26 +75,42 @@ class DiscordPlays(commands.Cog):
     @commands.has_role('Admin')
     async def stop_command(self, ctx):
         if ctx.message.channel in self.activeChannels:
-            embed = discord.Embed(title='Controller', color=0xff4055)
-            embed.add_field(name='Deactivated',
-                            value='Stopped listening to chat.', inline=False)
-            embed.set_author(name='discord-plays',
-                             icon_url='https://raw.githubusercontent.com/jack-margeson/discord-plays/master/profile_picture.png')
+            embed = self.makeEmbed(
+                'Controller', 0xff4055, 'Deactivated', 'Stopped listening to chat.')
             await ctx.send(embed=embed)
             self.activeChannels.remove(ctx.message.channel)
             if not self.activeChannels:
                 self.activeGame = ''
                 await ctx.bot.change_presence(status=discord.Status.idle, activity=discord.Activity())
         else:
-            embed = discord.Embed(title='Controller', color=0xff4055)
-            embed.add_field(
-                name='Error', value='Controller is currently inactive.')
-            embed.set_author(name='discord-plays',
-                             icon_url='https://raw.githubusercontent.com/jack-margeson/discord-plays/master/profile_picture.png')
+            embed = self.makeEmbed('Controller', 0xff4055, 'Error',
+                                   'Controller is currently inactive.')
             await ctx.send(embed=embed)
 
-    # on_message function for eventual reading of inputs
+    # error handling
+    @start_command.error
+    async def start_command_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            embed = self.makeEmbed('Controller', 0xff4055, 'Unknown arguments', 'If no game is running type `{0}start` followed by the game.\nIf a game is running in another channel, simply type `{0}start`'.format(
+                ctx.bot. command_prefix))
+            await ctx.send(embed=embed)
+        if isinstance(error, commands.BadArgument):
+            embed = self.makeEmbed(
+                'Controller', 0xff4055, 'Bad argument', '{0}'.format(error))
+            await ctx.send(embed=embed)
 
+    @commands.command(name='list', brief='Lists the availible games to play.',
+                      help='List the games that can be activated using the play command')
+    async def list_command(self, ctx):
+        with open('games/games.json') as json_file:
+            gamelist = json.load(json_file)
+        message = 'Available games:\n'
+        for game in gamelist:
+            message = message + game + '\n'
+        embed = self.makeEmbed('Controller', 0x77dd77, 'Game List', message)
+        await ctx.send(embed=embed)
+
+    # on_message function for eventual reading of inputs
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.channel in self.activeChannels:
@@ -99,6 +118,31 @@ class DiscordPlays(commands.Cog):
                 # add command to global array
                 controller.add_command(
                     self.controlsDict, self.controlsQueue, message.content)
+
+                # add command to firestore, first getting the most recent id to increment
+                maxid = self.db.collection(u'commands').document(
+                    u'0').get().to_dict()['maxid']
+
+                # add to firestore
+                doc_ref = self.db.collection(
+                    u'commands').document(str(maxid + 1))
+                doc_ref.set({
+                    u'name': message.author.display_name,
+                    u'command': message.content
+                })
+
+                # update maxid
+                self.db.collection(u'commands').document(
+                    u'0').set({u'maxid': maxid + 1})
+
+    def makeEmbed(self, title, color, name, value):
+        embed = discord.Embed(title=title, color=color)
+        embed.add_field(name=name,
+                        value=value,
+                        inline=False)
+        embed.set_author(name='discord-plays',
+                         icon_url='https://raw.githubusercontent.com/jack-margeson/discord-plays/master/profile_picture.png')
+        return embed
 
 
 def setup(bot):

@@ -1,6 +1,3 @@
-from firebase_admin import firestore
-from firebase_admin import credentials
-import firebase_admin
 import os
 import discord
 from discord.ext import tasks, commands
@@ -11,12 +8,6 @@ from discordBotCog import setup
 from dotenv import load_dotenv
 load_dotenv()
 discordToken = os.getenv("TOKEN")
-
-# Firestore setup
-cred = credentials.Certificate(
-    "discord-plays-firebase-adminsdk-regue-e6d351cad8.json")
-firebase_admin.initialize_app(credential=cred)
-db = firestore.client()
 
 # Code for setting up logging
 logging.basicConfig(level=logging.INFO)
@@ -34,7 +25,7 @@ async def on_ready():
     print('discord-plays bot loaded!')
     print('==================================')
 
-#install cog
+# install cog
 setup(bot)
 
 # Actually run the bot
