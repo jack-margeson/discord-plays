@@ -1,4 +1,7 @@
 .vscode
 .env
-projectplan.txt
 __pycache__
+/web/node_modules
+/web/package-lock.json
+/web/discord-play/node_modules
+projectplan.txt
