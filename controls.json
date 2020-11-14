@@ -1,0 +1,20 @@
+{
+    "up": "w",
+    "down": "s",
+    "left": "a",
+    "right": "d",
+    "up left": "w+a",
+    "up right": "w+d",
+    "down left": "s+a",
+    "down right": "s+d",
+    "start": "",
+    "select": "",
+    "a": "",
+    "b": "",
+    "x": "",
+    "y": "",
+    "r1": "",
+    "r2": "",
+    "x1": "",
+    "x2": ""
+}
