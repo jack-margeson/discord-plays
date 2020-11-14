@@ -41,12 +41,21 @@ async def on_ready():
 @commands.has_role('Admin')
 async def start_command(ctx):
     global isRunning
-    await ctx.send('Starting to read the chat for inputs...')
-    embed = discord.Embed(title='discord-plays', color=0x6441a5)
-    embed.add_field(name='Controller Acvitaved',
-                    value='Now listening to chat.', inline=False)
-    await ctx.send(embed=embed)
-    isRunning = True
+    if not isRunning:
+        embed = discord.Embed(title='Controller', color=0x77dd77)
+        embed.add_field(name='Activated',
+                        value='Now listening to chat in `{0}`.'.format(ctx.message.channel.name), inline=False)
+        embed.set_author(name='discord-plays',
+                         icon_url='https://raw.githubusercontent.com/jack-margeson/discord-plays/master/profile_picture.png')
+        await ctx.send(embed=embed)
+        isRunning = True
+    else:
+        embed = discord.Embed(title='Controller', color=0xff4055)
+        embed.add_field(name='Error', value='Controller is already active.')
+        embed.set_author(name='discord-plays',
+                         icon_url='https://raw.githubusercontent.com/jack-margeson/discord-plays/master/profile_picture.png')
+        await ctx.send(embed=embed)
+
 
 # Command to stop the reading of inputs
 
@@ -56,12 +65,26 @@ async def start_command(ctx):
 @commands.has_role('Admin')
 async def stop_command(ctx):
     global isRunning
-    await ctx.send('Stopping the controller...')
-    isRunning = False
+    if isRunning:
+        embed = discord.Embed(title='Controller', color=0xff4055)
+        embed.add_field(name='Deactivated',
+                        value='Stopped listening to chat.', inline=False)
+        embed.set_author(name='discord-plays',
+                         icon_url='https://raw.githubusercontent.com/jack-margeson/discord-plays/master/profile_picture.png')
+        await ctx.send(embed=embed)
+        isRunning = False
+    else:
+        embed = discord.Embed(title='Controller', color=0xff4055)
+        embed.add_field(
+            name='Error', value='Controller is currently inactive.')
+        embed.set_author(name='discord-plays',
+                         icon_url='https://raw.githubusercontent.com/jack-margeson/discord-plays/master/profile_picture.png')
+        await ctx.send(embed=embed)
+
 # on_message function for eventual reading of inputs
 
 
-@bot.event
+@ bot.event
 async def on_message(message):
     global isRunning
     global controlsQueue
