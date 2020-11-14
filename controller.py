@@ -2,6 +2,7 @@
 
 import keyboard
 import json
+from collections import deque
 
 # keyboard.press()
 # keyboard.release()
@@ -14,12 +15,12 @@ def load_controls_dict(filename):
 
 
 def add_command(controlsDict, queue, command):
-    queue.append(controlsDict(command))
-    return queue
+    print(queue, command)
+    queue.append(controlsDict[command])
 
 
-def update(queue):
-    keyboard.release(queue[0])
-    queue.popleft()
-    keyboard.press(queue[0])
-    return queue
+def controls_update(queue):
+    if queue:
+        action = queue.popleft()
+        keyboard.press(action)
+        keyboard.call_later(keyboard.release, args=(action), delay=1)
