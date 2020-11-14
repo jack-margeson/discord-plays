@@ -84,6 +84,7 @@ class DiscordPlays(commands.Cog):
             self.activeChannels.remove(ctx.message.channel)
             if not self.activeChannels:
                 self.activeGame = ''
+                self.controlsDict = {}
                 await ctx.bot.change_presence(status=discord.Status.idle, activity=discord.Activity())
         else:
             embed = self.makeEmbed('Controller', 0xff4055, 'Error',
@@ -112,6 +113,21 @@ class DiscordPlays(commands.Cog):
             message = message + game + '\n'
         embed = self.makeEmbed('Controller', 0x77dd77, 'Game List', message)
         await ctx.send(embed=embed)
+
+    @commands.command(name='commands', brief='Lists the availible commands.',
+                      help='List the commands a user can use while the controller is activated.')
+    async def commands_command(self, ctx):
+        if self.controlsDict:
+            message = 'Available commands:\n'
+            for action, button in self.controlsDict.items():
+                message = message + action + '\n'
+            embed = self.makeEmbed(
+                'Controller', 0x77dd77, 'Command List', message)
+            await ctx.send(embed=embed)
+        else:
+            embed = self.makeEmbed(
+                'Controller', 0xff4055, 'Error', 'No game loaded.')
+            await ctx.send(embed=embed)
 
     @commands.command(name='mode', brief='Sets or shows the mode of the bot.',
                       help='With no arguments it shows the current mode. Valid modes are democracy or anarchy')
