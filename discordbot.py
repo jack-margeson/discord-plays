@@ -30,6 +30,7 @@ controlsQueue = deque([])
 @bot.event
 async def on_ready():
     print('Logged in as {0} - {1}'.format(bot.user.name, bot.user.id))
+    print('discord-plays bot loaded!')
     print('==================================')
 
 # Command to start reading inputs
@@ -41,6 +42,10 @@ async def on_ready():
 async def start_command(ctx):
     global isRunning
     await ctx.send('Starting to read the chat for inputs...')
+    embed = discord.Embed(title='discord-plays', color=0x6441a5)
+    embed.add_field(name='Controller Acvitaved',
+                    value='Now listening to chat.', inline=False)
+    await ctx.send(embed=embed)
     isRunning = True
 
 # Command to stop the reading of inputs

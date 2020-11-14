@@ -23,4 +23,4 @@ def controls_update(queue):
     if queue:
         action = queue.popleft()
         keyboard.press(action)
-        keyboard.call_later(keyboard.release, args=(action), delay=1)
+        keyboard.call_later(keyboard.release, args=([action]), delay=.9)
