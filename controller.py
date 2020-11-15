@@ -20,6 +20,7 @@ def add_command(controlsDict, queue, command):
 
 def controls_update(queue, delay, mode):
     if queue:
+        print('Current queue:')
         print(queue)
         if mode == 'anarchy':
             action = queue.popleft()
@@ -36,5 +37,7 @@ def controls_update(queue, delay, mode):
 
             queue.clear()
 
+        print('Current action:')
+        print(action)
         keyboard.press(action)
         keyboard.call_later(keyboard.release, args=([action]), delay=delay)
