@@ -1,0 +1,14 @@
+{
+    "controls": {
+        "b":"k",
+        "a":"j",
+        "x":"i",
+        "xl":"l",
+        "start":"e",
+        "right":"d",
+        "left":"a",
+        "up":"w",
+        "down":"s"
+    },
+    "activation time": 0.9
+}

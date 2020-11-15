@@ -24,6 +24,7 @@ async def on_ready():
     print('Logged in as {0} - {1}'.format(bot.user.name, bot.user.id))
     print('discord-plays bot loaded!')
     print('==================================')
+    await bot.change_presence(status=discord.Status.idle, activity=discord.Activity())
 
 # install cog
 setup(bot)

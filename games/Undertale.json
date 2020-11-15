@@ -9,8 +9,8 @@
         "down left": "down+left",
         "down right": "down+right",
         "menu": "c",
-        "yes": "z",
-        "no": "x"
+        "a": "z",
+        "b": "x"
     },
     "activation time": 0.1
 }

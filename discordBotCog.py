@@ -26,7 +26,7 @@ class DiscordPlays(commands.Cog):
 
         # Firestore setup
         self.cred = credentials.Certificate(
-            "discord-plays-firebase-adminsdk-regue-e6d351cad8.json")
+            "discord-plays-firebase-adminsdk-regue-b4ba676567.json")
         firebase_admin.initialize_app(credential=self.cred)
         self.db = firestore.client()
 
@@ -117,15 +117,15 @@ class DiscordPlays(commands.Cog):
         embed = self.makeEmbed('Controller', 0x77dd77, 'Game List', message)
         await ctx.send(embed=embed)
 
-    @commands.command(name='commands', brief='Lists the available commands for the loaded game.',
+    @commands.command(name='controls', brief='Lists the available controls for the loaded game.',
                       help='List the commands a user can use while the controller is activated.')
-    async def commands_command(self, ctx):
+    async def controls_command(self, ctx):
         if self.config:
-            message = 'Available commands:\n'
+            message = 'Available controls:\n'
             for action, button in self.config["controls"].items():
                 message = message + action + '\n'
             embed = self.makeEmbed(
-                'Controller', 0x77dd77, 'Command List', message)
+                'Controller', 0x77dd77, 'Control List', message)
             await ctx.send(embed=embed)
         else:
             embed = self.makeEmbed(
@@ -169,10 +169,10 @@ class DiscordPlays(commands.Cog):
     @ commands.Cog.listener()
     async def on_message(self, message):
         if message.channel in self.activeChannels:
-            if message.content in self.config["controls"]:
+            if message.content.lower() in self.config["controls"]:
                 # add command to global array
                 controller.add_command(
-                    self.config["controls"], self.controlsQueue, message.content)
+                    self.config["controls"], self.controlsQueue, message.content.lower())
 
                 # add command to firestore, first getting the most recent id to increment
                 maxid = self.db.collection(u'commands').document(
@@ -183,7 +183,7 @@ class DiscordPlays(commands.Cog):
                     u'commands').document(str(maxid + 1))
                 doc_ref.set({
                     u'name': message.author.display_name,
-                    u'command': message.content
+                    u'command': message.content.lower()
                 })
 
                 # update maxid

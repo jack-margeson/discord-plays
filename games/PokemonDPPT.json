@@ -1,0 +1,17 @@
+{
+    "controls": {
+        "up": "up",
+        "down": "down",
+        "left": "left",
+        "right": "right",
+        "start": "enter",
+        "select": "right shift",
+        "a": "x",
+        "b": "z",
+        "x": "s",
+        "y": "a",
+        "r": "q",
+        "l": "w"
+    },
+    "activation time": 0.1
+}
