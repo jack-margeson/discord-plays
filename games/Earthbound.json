@@ -1,15 +1,21 @@
 {
     "controls": {
-        "up": "w",
-        "down": "s",
-        "left": "a",
-        "right": "d",
-        "start": "v",
-        "select": "c",
+        "up": "i",
+        "down": "k",
+        "left": "j",
+        "right": "l",
+        "up left": "i+j",
+        "up right": "i+l",
+        "down left": "k+j",
+        "down right": "k+l",
+        "start": "enter",
+        "select": "shift",
         "a": "x",
         "b": "z",
-        "r": "r",
-        "l": "l"
+        "x": "s",
+        "y": "a",
+        "r": "w",
+        "l": "q"
     },
-    "activation time": 0.9
+    "activation time": 0.3
 }

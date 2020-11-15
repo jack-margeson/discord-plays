@@ -1,16 +1,16 @@
 {
     "controls": {
-        "up": "w",
-        "down": "s",
-        "left": "a",
-        "right": "d",
+        "w": "w",
+        "s": "s",
+        "a": "a",
+        "d": "d",
         "up left": "w+a",
         "up right": "w+d",
         "down left": "s+a",
         "down right": "s+d",
         "start": "",
         "select": "",
-        "a": "x",
+        "a2": "x",
         "b": "z",
         "x": "c",
         "y": "v",
@@ -19,5 +19,5 @@
         "l1": "r",
         "l2": "y"
     },
-    "activation time": 0.9
+    "activation time": 2.5
 }
