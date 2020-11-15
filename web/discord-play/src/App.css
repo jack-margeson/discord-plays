@@ -36,7 +36,9 @@
   width: 80%;
   min-height: 100%;
   padding: 10px;
-  background-color: white;
+  color: white;
+  font-family: 'Roboto', sans-serif;
+  text-align: right;
 }
 
 .join-discord {

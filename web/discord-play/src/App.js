@@ -16,7 +16,17 @@ firebase.initializeApp({
 });
 
 var db = firebase.firestore();
-console.log(db.collection('commands'));
+var shown_commands = [];
+
+db.collection('commands').onSnapshot(function(querySnapshot) {
+  var commands = [];
+  querySnapshot.forEach(function(doc) {
+    commands.splice(parseInt(doc.id), 0, doc.data().name+ " " + doc.data().command);
+  });
+
+  shown_commands = commands.slice(Math.max(commands.length - 5, 1));
+  console.log(shown_commands);
+});
 
 const styles = {
   main: {
@@ -49,7 +59,10 @@ function App() {
             <Grid item xs={6} className="statistics">
               <Grid container spacing={0} direction="column" alignContent="center" justify="center">
                 <div className="statistics-text">
-                  <span>statistics placeholder!</span>
+                  <span>Anarchic gaming, now with friends! </span><br></br><br></br><br></br>
+                  <span>Discord is a social chat platform for friends and communities to congregate online. With discord-plays, you can play your favorite games together as one, but with a twist: everyone is using the same controller! Work together with everyone to get a high score on your favorite games, or, screw over your friends by making your character jump over and over again.</span><br></br><br></br><br></br>
+                  <span>Try it out now by joining our Discord on the right! We hope you have as much fun playing with discord-plays  as we did making it.</span><br></br><br></br><br></br>
+                  <span>- Drew, Landon, Jack, and Cameron (the discord-plays team)</span>
                 </div>
               </Grid>
             </Grid>
