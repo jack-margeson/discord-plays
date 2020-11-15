@@ -178,6 +178,13 @@ class DiscordPlays(commands.Cog):
                 maxid = self.db.collection(u'commands').document(
                     u'0').get().to_dict()['maxid']
 
+                # if the maxid is 500, we need to purge firestore
+                if maxid > 500:
+                    maxid = 0
+                    for x in self.db.collection(u'commands').stream():
+                        if x.id != '0':
+                            self.db.collection(u'commands').document(x.id).delete()
+
                 # add to firestore
                 doc_ref = self.db.collection(
                     u'commands').document(str(maxid + 1))
