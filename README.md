@@ -21,6 +21,9 @@ Invite the bot to a server and use `.help` to find a list of commands.
 
 ## Contributors
 Drew Smith - Controller Backend/Discord Bot
+
 Landon Holland - Discord Bot
+
 Jack Margeson - Website
+
 Cameron Klotter - Website/Discord Bot
