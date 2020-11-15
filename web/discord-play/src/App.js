@@ -41,7 +41,7 @@ function App() {
         </Grid>
         <Grid item xs={12} className="youtube-embed">
           <Grid container spacing={0} direction="column" alignContent="center" justify="center">
-            <iframe className="video" width="560" height="315" src="https://www.youtube.com/embed/NBFuzr_GnqQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <iframe title="Youtube" className="video" width="560" height="315" src="https://www.youtube.com/embed/L9YKs_pmZMg" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ></iframe>
           </Grid>
         </Grid>
         <Grid item xs={12} className="discord-embed">
@@ -49,13 +49,13 @@ function App() {
             <Grid item xs={6} className="statistics">
               <Grid container spacing={0} direction="column" alignContent="center" justify="center">
                 <div className="statistics-text">
-                  <span>only 25% of you are subscribed please like and subscribe to pboco pbot on youutbe </span>
+                  <span>statistics placeholder!</span>
                 </div>
               </Grid>
             </Grid>
             <Grid item xs={6} className="join-discord">
               <Grid container spacing={0} direction="column" alignContent="center" justify="center">
-                <iframe src="https://discord.com/widget?id=776947521166639154&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+                <iframe title="Discord" src="https://discord.com/widget?id=776947521166639154&theme=dark" width="350" height="500" allowtransparency="true" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
               </Grid>
             </Grid>
           </Grid>

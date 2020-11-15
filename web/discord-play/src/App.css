@@ -1,6 +1,7 @@
 * {
   margin:0px;
   padding:0px;
+  border: none;
 }
 
 .main-container {
@@ -17,12 +18,14 @@
   max-width: 100%;
   padding-top: 30px;
   padding-bottom: 30px;
+  padding-left: 28px;
 }
 
 .video {
   max-width: 100%;
   padding-top: 10px;
-  padding-bottom: 20px;
+  padding-bottom: 30px;
+  border: none;
 }
 
 .statistics {
@@ -34,11 +37,11 @@
   min-height: 100%;
   padding: 10px;
   background-color: white;
-
 }
 
 .join-discord {
   padding-left: 10px;
+  border: none;
 }
 
  @media only screen and (max-width: 600px) {
