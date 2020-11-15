@@ -1,0 +1,16 @@
+{
+    "controls": {
+        "up": "up",
+        "down": "down",
+        "left": "left",
+        "right": "right",
+        "up left": "up+left",
+        "up right": "up+right",
+        "down left": "down+left",
+        "down right": "down+right",
+        "menu": "c",
+        "yes": "z",
+        "no": "x"
+    },
+    "activation time": 0.1
+}

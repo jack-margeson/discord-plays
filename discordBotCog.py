@@ -17,8 +17,8 @@ class DiscordPlays(commands.Cog):
         # variable to see if bot is running in a channel
         self.activeChannels = []
 
-        # dictionary to hold the controls
-        self.controlsDict = {}
+        # config to hold the controls
+        self.config = {}
         self.controlsQueue = deque([])
 
         # variable to store the active game
@@ -36,9 +36,13 @@ class DiscordPlays(commands.Cog):
     def cog_unload(self):
         self.main_loop.cancel()
 
-    @tasks.loop(seconds=1.0)
+    @tasks.loop(seconds=0.5)
     async def main_loop(self):
-        controller.controls_update(self.controlsQueue)
+        if self.config:
+            controller.controls_update(
+                self.controlsQueue, self.config["activation time"], self.mode)
+        else:
+            self.controlsQueue.clear()
 
     # Command to start reading inputs
 
@@ -47,25 +51,24 @@ class DiscordPlays(commands.Cog):
     @commands.has_role('Admin')
     async def start_command(self, ctx, GameName):
         if not ctx.message.channel in self.activeChannels:
-            if (not self.activeGame and GameName) or (self.activeGame and not GameName):
-                if not self.activeGame:
-                    print('attempting to load game', GameName)
-                    try:
-                        config = controller.load_controls_dict(
-                            'games/{0}.json'.format(GameName))
-                    except FileNotFoundError:
-                        print('Error loading game', GameName)
-                        raise commands.BadArgument(
-                            'Error loading game `{0}`'.format(GameName))
-                    print('loaded game', GameName)
-                    self.controlsDict = config
-                    self.activeGame = GameName
-                    await ctx.bot.change_presence(status=discord.Status.online,
-                                                  activity=discord.Game(name=self.activeGame))
-                embed = self.makeEmbed('Controller', 0x77dd77, 'Activated', 'Now listening to chat in `{0}` for the game `{1}`.'.format(
-                    ctx.message.channel.name, self.activeGame))
-                await ctx.send(embed=embed)
-                self.activeChannels.append(ctx.message.channel)
+            if not self.activeGame:
+                print('attempting to load game', GameName)
+                try:
+                    config = controller.load_config(
+                        'games/{0}.json'.format(GameName))
+                except FileNotFoundError:
+                    print('Error loading game', GameName)
+                    raise commands.BadArgument(
+                        'Error loading game `{0}`'.format(GameName))
+                print('loaded game', GameName)
+                self.config = config
+                self.activeGame = GameName
+                await ctx.bot.change_presence(status=discord.Status.online,
+                                              activity=discord.Game(name=self.activeGame))
+            embed = self.makeEmbed('Controller', 0x77dd77, 'Activated', 'Now listening to chat in `{0}` for the game `{1}`.'.format(
+                ctx.message.channel.name, self.activeGame))
+            await ctx.send(embed=embed)
+            self.activeChannels.append(ctx.message.channel)
         else:
             embed = self.makeEmbed(
                 'Controller', 0xff4055, 'Error', 'Controller is already active.')
@@ -84,7 +87,7 @@ class DiscordPlays(commands.Cog):
             self.activeChannels.remove(ctx.message.channel)
             if not self.activeChannels:
                 self.activeGame = ''
-                self.controlsDict = {}
+                self.config = {}
                 await ctx.bot.change_presence(status=discord.Status.idle, activity=discord.Activity())
         else:
             embed = self.makeEmbed('Controller', 0xff4055, 'Error',
@@ -103,7 +106,7 @@ class DiscordPlays(commands.Cog):
                 'Controller', 0xff4055, 'Bad argument', '{0}'.format(error))
             await ctx.send(embed=embed)
 
-    @commands.command(name='list', brief='Lists the availible games to play.',
+    @commands.command(name='list', brief='Lists the available games to play.',
                       help='List the games that can be activated using the play command.')
     async def list_command(self, ctx):
         with open('games/games.json') as json_file:
@@ -114,12 +117,12 @@ class DiscordPlays(commands.Cog):
         embed = self.makeEmbed('Controller', 0x77dd77, 'Game List', message)
         await ctx.send(embed=embed)
 
-    @commands.command(name='commands', brief='Lists the availible commands.',
+    @commands.command(name='commands', brief='Lists the available commands for the loaded game.',
                       help='List the commands a user can use while the controller is activated.')
     async def commands_command(self, ctx):
-        if self.controlsDict:
+        if self.config:
             message = 'Available commands:\n'
-            for action, button in self.controlsDict.items():
+            for action, button in self.config["controls"].items():
                 message = message + action + '\n'
             embed = self.makeEmbed(
                 'Controller', 0x77dd77, 'Command List', message)
@@ -152,15 +155,24 @@ class DiscordPlays(commands.Cog):
                 'Controller', 0xff4055, 'Bad argument', '{0}'.format(error))
             await ctx.send(embed=embed)
 
+    @commands.command(name='shutdown', brief='Shuts the bot down.',
+                      help='Shuts the bot down. Must be Admin to use.')
+    @commands.has_role('Admin')
+    async def shutdown_command(self, ctx):
+        embed = self.makeEmbed(
+            'Controller', 0xff4055, 'Shutting down...', 'Bot is shutting down.')
+        await ctx.send(embed=embed)
+        await ctx.bot.logout()
+
     # on_message function for eventual reading of inputs
 
     @ commands.Cog.listener()
     async def on_message(self, message):
         if message.channel in self.activeChannels:
-            if message.content in self.controlsDict:
+            if message.content in self.config["controls"]:
                 # add command to global array
                 controller.add_command(
-                    self.controlsDict, self.controlsQueue, message.content)
+                    self.config["controls"], self.controlsQueue, message.content)
 
                 # add command to firestore, first getting the most recent id to increment
                 maxid = self.db.collection(u'commands').document(
