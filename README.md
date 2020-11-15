@@ -5,12 +5,19 @@ A Discord bot using discord.py that scans a channel for control inputs that can 
 
 ## Installation
 Clone the repository onto your machine.
+
 Create a virtual environment with Python 3.8.
+
 Activate the virtual environment and run `pip install -r requirements.txt`.
+
 Setup a Google Firestore, get a private key and change line 29 of `discordBotCog.py` with the path to your Google Firestore private key json file.
+
 Setup a Discord bot application and grab the token and replace line 10 `discordbot.py` with the token of your bot.
+
 Run the bot using `python discordbot.py`.
+
 Invite the bot to a server and use `.help` to find a list of commands.
+
 
 ## Contributors
 Drew Smith - Controller Backend/Discord Bot
