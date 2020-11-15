@@ -1,0 +1,10 @@
+{
+    "controls": {
+        "q": "q",
+        "w": "w",
+        "o": "o",
+        "p": "p",
+        "space": "space"
+    },
+    "activation time": 0.1
+}

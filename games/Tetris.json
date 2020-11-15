@@ -1,0 +1,13 @@
+{
+    "controls": {
+        "up": "i",
+        "down": "k",
+        "left": "j",
+        "right": "l",
+        "start": "enter",
+        "select": "shift",
+        "a": "x",
+        "b": "z"
+    },
+    "activation time": 0.1
+}
